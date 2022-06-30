@@ -4,29 +4,18 @@
 {% block css_files %}
 	{% comment %} <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> {% endcomment %}
     <link rel="stylesheet" href="{% static "stilltheory_app/includes/header.css" %}">
-    <link rel="stylesheet" href="{% static "stilltheory_app/username.css" %}">
+    <link rel="stylesheet" href="{% static "stilltheory_app/homepage.css" %}">
 
 	{% comment %} <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous"> {% endcomment %}
 {% endblock %}
 
 {% block page_title %}
-    Stilltheory - Username
+    Stilltheory - Home
 {% endblock %}
 
 {% block content %}
 
     {% include "stilltheory_app/includes/header.html" %}
-	<div class="username">
-        <form method="POST" action="" enctype="multipart/form-data">
-            {% csrf_token %}
-            <span>Enter a Lichess username:</span>
-            <div class="username_textbox">
-                <input type="text" name="username" style="margin-bottom: 10px">
-            </div>
-            <div class="submit_username">
-                <input class="btn login_btn" type="submit" value="Submit username">
-            </div>
-        </form>
-    </div>
+	
 {% endblock %}
     

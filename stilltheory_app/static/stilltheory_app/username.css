@@ -1,0 +1,8 @@
+.username {
+    vertical-align:middle;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 330px;
+}
