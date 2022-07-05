@@ -11,7 +11,7 @@ def prepare_database(usr, usr_id):
     username = usr  
     opening = ""
     color = ""
-    num_games_to_analyze = 200
+    num_games_to_analyze = 600
     conn = psycopg2.connect(
         user="postgres",
         host="127.0.0.1",
@@ -216,13 +216,18 @@ def prepare_database(usr, usr_id):
         if cursor2.rowcount == 0:
         # get opening name:
             url2 = 'https://explorer.lichess.ovh/masters?play=' + ','.join(record[1].split())   
-            info =  urllib.request.urlopen(url2)
+            try:
+                info =  urllib.request.urlopen(url2)
+            except:
+                time.sleep(45)
+                info =  urllib.request.urlopen(url2)
+
+
             # print('position doesnt exist' + str(record[1]))
-            sleepCnt += 1
-            if sleepCnt == 30:
-                print('Now sleeping')
-                time.sleep(20)
-                sleepCnt = 0
+            # sleepCnt += 1
+            # if sleepCnt == 30:
+            #     # print('Now sleeping')
+            #     sleepCnt = 0
             for line in info:
                 curr_line = (line.decode('utf-8'))
                 for i in range(0, len(curr_line) - 6):
@@ -278,7 +283,12 @@ def prepare_database(usr, usr_id):
     """)
     conn.commit()
 
-
+    cursorxy = conn.cursor()
+    cursorxy.execute(
+        """
+        DELETE from opening_tree WHERE num_games < 5
+        """
+    )
 
 # get parent id:
     cursor7 = conn.cursor()

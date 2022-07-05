@@ -41,10 +41,10 @@
                             home</a>
                         </li>
                         <li><a href="#page1">About</a></li>
-                        <li><a href="{% url 'dashboard'%}">Dashboard</a></li>
+                        <li><a href="{% url 'dashboard' username='unclezebra' usr_id=4%}">Dashboard</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a href="{%url 'login'%}">Log in</a></li>
+                        <li><a href="{%url 'get_token'%}">Log in</a></li>
                     </ul>
                 </div>
             </div>

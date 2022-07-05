@@ -49,8 +49,7 @@ INSTALLED_APPS = [
 
     'django.contrib.sites',
     'oauth2_provider',    
-    'stilltheory_app',
-
+    'stilltheory_app'
 
 ]
 
