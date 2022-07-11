@@ -1,56 +1,4 @@
-{% load static %}
-
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-
-    <title>Tree Example</title>
-	<div id="popup" style="display: none">description text here</div>
-    <style>
-	
-	.node {
-		cursor: pointer;
-	}
-
-	.node circle {
-	  fill: #fff;
-	  stroke: steelblue;
-	  stroke-width: 3px;
-	}
-
-	.node text {
-	  font: 12px sans-serif;
-	}
-
-	.link {
-	  fill: none;
-	  stroke: #ccc;
-	  stroke-width: 2px;
-	}
-	
-	div.tooltip {   
-		position: absolute;         
-		/*your other styles here*/;              
-	}
-    </style>
-
-  </head>
-  <p id="demo"></p>
-
-  <body>
-<div class="board1" id="board1"></div>
-
-<div class='tooltip'></div>
-<!-- load the d3.js library -->	
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
-<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
-
-<script></script>
-
-
-<script type='module'>
-{% comment %} import {COLOR, Chessboard} from "src/cm-chessboard/Chessboard.js" {% endcomment %}
+// import {COLOR, Chessboard} from "src/cm-chessboard/Chessboard.js"
 
 var data = '{{str|escapejs}}';
 var treeData = eval(data)
@@ -93,22 +41,9 @@ function update(source) {
   // Normalize for fixed-depth.
   nodes.forEach(function(d) { d.y = d.depth * 400; });
 
-  svg.selectAll()
-  var tooltip = d3.select("body").append("div") 
-	.attr("class", "tooltip")               
-	.style("opacity", 0);
   // Update the nodes…
   var node = svg.selectAll("g.node")
 	  .data(nodes, function(d) { return d.id || (d.id = ++i); });
-	 /* .on("mousemove", function(d) {
-		tooltip.html("Hello, I am<br>a tooltip!")
-			.style('top', d3.event.pageY - 6 + 'px')
-			.style('left', d3.event.pageX + 10 + 'px')
-			.style("opacity", 1);
-		}).on("mouseout", function(d) {
-			tooltip.style("opacity", 0);
-		});*/
-	  
 
   // Enter any new nodes at the parent's previous position.
   var nodeEnter = node.enter().append("g")
@@ -131,26 +66,17 @@ function update(source) {
   var nodeUpdate = node.transition()
 	  .duration(duration)
 	  .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
-
-
-	
+	  
   nodeUpdate.select("circle")
   .attr("r", 15)
-  .style("fill", function(d) {return d._children ? shadeColor(d.color, -20) : d.color; }) 
+  .style("fill", function(d) {return d._children ? shadeColor(d.color, -20) : d.color; })
 
 
-  //.on('mouseover', function(d) {
-	//document.getElementById('popup').style.display = 'block';
-	
-  //})
-  
-
-
- // new Chessboard(document.getElementById("board1"), {
-	//	position: "rn2k1r1/ppp1pp1p/3p2p1/5bn1/P7/2N2B2/1PPPPP2/2BNK1RR w Gkq - 4 11",
-	// 	sprite: {url: "../../../static/assets/images/chessboard-sprite-staunty.svg"},
-//		orientation: COLOR.black
- // })
+//   new Chessboard(document.getElementById("board1"), {
+// 	  position: "rn2k1r1/ppp1pp1p/3p2p1/5bn1/P7/2N2B2/1PPPPP2/2BNK1RR w Gkq - 4 11",
+// 	  sprite: {url: "../../../static/assets/images/chessboard-sprite-staunty.svg"},
+// 	  orientation: COLOR.black
+//   })
 
 //  nodes.forEach(function(d) { 
 //	nodeUpda§te.select("circle")
@@ -237,8 +163,3 @@ function click(d) {
   }
   update(d);
 }
-
-</script>
-	
-  </body>
-</html>

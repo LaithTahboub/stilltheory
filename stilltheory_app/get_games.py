@@ -1,3 +1,4 @@
+import re
 import urllib
 import urllib.request
 import psycopg2
@@ -11,7 +12,7 @@ def prepare_database(usr, usr_id):
     username = usr  
     opening = ""
     color = ""
-    num_games_to_analyze = 600
+    num_games_to_analyze = 50
     conn = psycopg2.connect(
         user="postgres",
         host="127.0.0.1",
@@ -118,16 +119,21 @@ def prepare_database(usr, usr_id):
     #(move_list)
 
     uci_moves = [[]]
+    fen_list = [[]]
     x = 0
     for game in move_list:
         board = chess.Board()
         uci_moves.append([])
+        fen_list.append([])
         for move in game:
             # print(move)
             uci_moves[x].append(board.push_san(move).uci())
+            fen_list[x].append(board.fen())
             # board.parse_uci(board.push_san(move).uci())
+
         x += 1
-    
+    del(fen_list[0])
+    del(fen_list[-1])
 
     for i in range(0, len(move_list)):
         position_list.append([])
@@ -141,7 +147,7 @@ def prepare_database(usr, usr_id):
             position_list[i].append(curr[:-1])
             position_uci_list[i].append(curr_uci[:-1])
             # opening processing:
-            # print(url2) 
+            #   url2) 
             # opening_info = urllib.request.urlopen(url2)
             # for line in opening_info: 
             #     curr_line = (line.decode('utf-8'))
@@ -156,6 +162,7 @@ def prepare_database(usr, usr_id):
     del(position_list[0])
     del(position_list[-1])
 
+
     del(position_uci_list[0])
     del(position_uci_list[-1])
 
@@ -169,25 +176,24 @@ def prepare_database(usr, usr_id):
 
 
     # tenemos todo lo que necesitamos en este punto
-    # print(variant_list)
     # result_and_game_id_and_position_and_color_and_variant_index = 0
     # for game in move_list:
     #     if variant_list[result_and_game_id_and_position_and_color_and_variant_index] == 'Standard':
     #         for i in range(0, min(len(game), 15)):
     #                 if result_list[result_and_game_id_and_position_and_color_and_variant_index] == 'win':
     #                     cursor.execute("""
-    #                     INSERT INTO moves(move, color, win, loss, draw, game_id, sequence, position, user_id, uci_position) VALUES('%s', '%s', TRUE, FALSE, FALSE, '%s', '%s', '%s', '%s', '%s')
-    #                     """ % (game[i], color_list[result_and_game_id_and_position_and_color_and_variant_index], game_id_list[result_and_game_id_and_position_and_color_and_variant_index], i + 1, position_list[result_and_game_id_and_position_and_color_and_variant_index][i], user_id, position_uci_list[result_and_game_id_and_position_and_color_and_variant_index][i]))
+    #                     INSERT INTO moves(move, color, win, loss, draw, game_id, sequence, position, user_id, uci_position, fen_position) VALUES('%s', '%s', TRUE, FALSE, FALSE, '%s', '%s', '%s', '%s', '%s', '%s')
+    #                     """ % (game[i], color_list[result_and_game_id_and_position_and_color_and_variant_index], game_id_list[result_and_game_id_and_position_and_color_and_variant_index], i + 1, position_list[result_and_game_id_and_position_and_color_and_variant_index][i], user_id, position_uci_list[result_and_game_id_and_position_and_color_and_variant_index][i], fen_list[result_and_game_id_and_position_and_color_and_variant_index][i]))
     #                     conn.commit()
     #                 elif result_list[result_and_game_id_and_position_and_color_and_variant_index] == 'loss':
     #                     cursor.execute("""
-    #                     INSERT INTO moves(move, color, win, loss, draw, game_id, sequence, position, user_id, uci_position) VALUES('%s', '%s', FALSE, TRUE, FALSE, '%s', '%s', '%s', '%s', '%s')
-    #                     """ % (game[i], color_list[result_and_game_id_and_position_and_color_and_variant_index], game_id_list[result_and_game_id_and_position_and_color_and_variant_index], i + 1, position_list[result_and_game_id_and_position_and_color_and_variant_index][i], user_id, position_uci_list[result_and_game_id_and_position_and_color_and_variant_index][i]))
+    #                     INSERT INTO moves(move, color, win, loss, draw, game_id, sequence, position, user_id, uci_position, fen_position) VALUES('%s', '%s', FALSE, TRUE, FALSE, '%s', '%s', '%s', '%s', '%s', '%s')
+    #                     """ % (game[i], color_list[result_and_game_id_and_position_and_color_and_variant_index], game_id_list[result_and_game_id_and_position_and_color_and_variant_index], i + 1, position_list[result_and_game_id_and_position_and_color_and_variant_index][i], user_id, position_uci_list[result_and_game_id_and_position_and_color_and_variant_index][i], fen_list[result_and_game_id_and_position_and_color_and_variant_index][i]))
     #                     conn.commit()
     #                 else:
     #                     cursor.execute("""
-    #                     INSERT INTO moves(move, color, win, loss, draw, game_id, sequence, position, user_id, uci_position) VALUES('%s', '%s', FALSE, FALSE, TRUE, '%s', '%s', '%s', '%s', '%s')
-    #                     """ % (game[i], color_list[result_and_game_id_and_position_and_color_and_variant_index], game_id_list[result_and_game_id_and_position_and_color_and_variant_index], i + 1, position_list[result_and_game_id_and_position_and_color_and_variant_index][i], user_id, position_uci_list[result_and_game_id_and_position_and_color_and_variant_index][i]))
+    #                     INSERT INTO moves(move, color, win, loss, draw, game_id, sequence, position, user_id, uci_position, fen_position) VALUES('%s', '%s', FALSE, FALSE, TRUE, '%s', '%s', '%s', '%s', '%s', '%s')
+    #                     """ % (game[i], color_list[result_and_game_id_and_position_and_color_and_variant_index], game_id_list[result_and_game_id_and_position_and_color_and_variant_index], i + 1, position_list[result_and_game_id_and_position_and_color_and_variant_index][i], user_id, position_uci_list[result_and_game_id_and_position_and_color_and_variant_index][i], fen_list[result_and_game_id_and_position_and_color_and_variant_index][i]))
     #                     conn.commit()
     #     result_and_game_id_and_position_and_color_and_variant_index += 1
 
@@ -219,7 +225,7 @@ def prepare_database(usr, usr_id):
             try:
                 info =  urllib.request.urlopen(url2)
             except:
-                time.sleep(45)
+                time.sleep(19)
                 info =  urllib.request.urlopen(url2)
 
 
@@ -272,23 +278,23 @@ def prepare_database(usr, usr_id):
 # populate opening_tree
     cursor6 = conn.cursor()
     cursor6.execute("""
-    INSERT INTO opening_tree(sequence, position, color, num_games, num_wins, num_losses, num_draws, user_id) 
+    INSERT INTO opening_tree(sequence, position, color, num_games, num_wins, num_losses, num_draws, user_id, fen_position) 
     SELECT moves.sequence, moves.position, moves.color, COUNT(*), 
     SUM(CASE WHEN win = TRUE THEN 1 ELSE 0 END), 
     SUM(CASE WHEN loss = TRUE THEN 1 ELSE 0 END),
     SUM(CASE WHEN draw = TRUE THEN 1 ELSE 0 END),
-    user_id
+    user_id, fen_position
     FROM moves
-    GROUP BY sequence, position, color, user_id
+    GROUP BY sequence, position, color, user_id, fen_position
     """)
     conn.commit()
 
-    cursorxy = conn.cursor()
-    cursorxy.execute(
-        """
-        DELETE from opening_tree WHERE num_games < 5
-        """
-    )
+    # cursorxy = conn.cursor()
+    # cursorxy.execute(
+    #     """
+    #     DELETE from opening_tree WHERE num_games < 5
+    #     """
+    # )
 
 # get parent id:
     cursor7 = conn.cursor()

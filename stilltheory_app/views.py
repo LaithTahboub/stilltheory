@@ -41,6 +41,7 @@ async def get_token(request):
     code_verifier = code_verifier.decode('utf-8')
     code_challenge = hashlib.sha256(code_verifier.encode('utf-8')).digest()
     code_challenge = base64.urlsafe_b64encode(code_challenge).decode('utf-8').replace('=', '')
+    # code_verifier = code_verifier.encode('utf-8')
     # code = aiohttp.request.rel_url.query.get("code")
 
 
@@ -52,7 +53,7 @@ async def get_token(request):
             "state": 'zwDR8BuZRckY0W0aVRgeZmZ7IV8FSO2u1zLIL5Yc5u72dTQOM5Nivlgiezk9fW0bxh8xKY47RmzRt9nsMLucObzS5TmHWO86EB6frBsm4qTlhRsO6dNSOTGwYeTKs2yU',
             "client_id": '9Q1aqLsGmmRGJDWdUEgYocJwiZ7yfNO4YN8PR4er',
             "response_type": "code",
-            "redirect_uri": 'http://127.0.0.1:8000/login',
+            "redirect_uri": 'http://127.0.0.1:8000/login/' ,
             "code_challenge": code_challenge,
             "code_challenge_method": "S256",
         }
@@ -62,20 +63,20 @@ async def get_token(request):
 
 
 
-async def login(request, code_verifier, code):
-    
+async def login(request, code, state):
     #  is our tokenk lip_Al3w9AX8TW8puxBnPmE1
     # url = 'https://lichess.org/api/account'
-
+    code = request.path
+    # print('hello'+code)
     data = {
             "grant_type": "authorization_code",
-            "code": 'jfsPz4j2olZpUn0MwZJE46yc8Yt2YB',
-            "code_verifier": code_verifier,
+            "code": code,
+            # "code_verifier": code_verifier,
             "client_id": '9Q1aqLsGmmRGJDWdUEgYocJwiZ7yfNO4YN8PR4er',
-            "redirect_uri": 'http://127.0.0.1:8000/login', 
+            # "redirect_uri": 'http://127.0.0.1:8000/login', 
             # TODO: add params
-        }
-
+        }   
+                        
     async with aiohttp.ClientSession() as client_session:
         async with client_session.post('https://lichess.org/api/token', json=data) as resp:
             data = await resp.json()
@@ -83,9 +84,10 @@ async def login(request, code_verifier, code):
             token = data.get("access_token")
             if token is not None:
                 # TODO: "expires_in": 5270400
-                return redirect("login/%s/%s/%s" % (code_verifier, code_challenge, token))
+                return redirect("login/%s/%s/%s" % ('code_verifier', token))
             else:
                 return redirect("index")
+
 # helper method to avoid making coroutine:
 def make_user(usr, fname, lname, closed, tosVio):
     User = get_user_model().objects.create_user(username = usr)  
@@ -174,14 +176,14 @@ def dashboard(request, username, usr_id):
     # using 0 in next line just as placeholder. should use request.USER in future
     cursor.execute("""
     WITH RECURSIVE opening_tree_visual AS (
-        SELECT id, parent_id, position, opening_variation, num_wins, num_losses,
+        SELECT id, parent_id, position, opening_variation, num_wins, num_losses, num_draws, fen_position,
                 to_char(id,'9999') AS path
         FROM opening_tree
         WHERE parent_id IS NULL AND user_id = '%s'
 
         UNION ALL
 
-        SELECT o.id, o.parent_id, o.position, o.opening_variation, o.num_wins, o.num_losses,
+        SELECT o.id, o.parent_id, o.position, o.opening_variation, o.num_wins, o.num_losses, o.num_draws, o.fen_position,
                 opening_tree_visual.path || '->' || to_char(o.id,'9999')
         FROM opening_tree o, opening_tree_visual
         WHERE o.parent_id = opening_tree_visual.id AND user_id = '%s'
@@ -197,18 +199,18 @@ def dashboard(request, username, usr_id):
     # TODO: consider adding draws to total
     data_dump = cursor.fetchall()
     if data_dump[1][1] == data_dump[0][0]:
-        data += data_dump[0][3] + '(((' + str(data_dump[0][4] / (data_dump[0][5] + data_dump[0][4])) + ')))' + '\n' + data_dump[0][3] + '(((' + str(data_dump[0][4] / (data_dump[0][5] + data_dump[0][4])) + ')))' + '   '
+        data += data_dump[0][3] + '(((' + str(data_dump[0][4] / (data_dump[0][5] + data_dump[0][4] + data_dump[0][6])) + ')))' + '((((' + data_dump[0][7] + '))))' + '\n' + data_dump[0][3] + '(((' + str(data_dump[0][4] / (data_dump[0][5] + data_dump[0][4] + data_dump[0][6])) + ')))' + '((((' + data_dump[0][7] + '))))' + '   '
     else:
-        data += data_dump[0][3] + '(((' + str(data_dump[0][4] / (data_dump[0][5] + data_dump[0][4])) + ')))' + '\n' + data_dump[0][3] + '(((' + str(data_dump[0][4] / (data_dump[0][5] + data_dump[0][4])) + ')))'
+        data += data_dump[0][3] + '(((' + str(data_dump[0][4] / (data_dump[0][5] + data_dump[0][4] + data_dump[0][6])) + ')))' + '((((' + data_dump[0][7] + '))))' + '\n' + data_dump[0][3] + '(((' + str(data_dump[0][4] / (data_dump[0][5] + data_dump[0][4] + data_dump[0][6])) + ')))' + '((((' + data_dump[0][7] + '))))'
     for i in range(1, len(data_dump)):
         if data_dump[i][1] is None and i < len(data_dump) - 1 and data_dump[i + 1][1] == data_dump[i][0]:
-            data += '\n' + data_dump[i][3] + '(((' + str(data_dump[i][4] / (data_dump[i][5] + data_dump[i][4])) + ')))' + '   '
+            data += '\n' + data_dump[i][3] + '(((' + str(data_dump[i][4] / (data_dump[i][5] + data_dump[i][4] + data_dump[i][6])) + ')))' + '((((' + data_dump[i][7] + '))))' + '   '
         elif data_dump[i][1] is None:
-            data += '\n' + data_dump[i][3] + '(((' + str(data_dump[i][4] / (data_dump[i][5] + data_dump[i][4])) + ')))'
+            data += '\n' + data_dump[i][3] + '(((' + str(data_dump[i][4] / (data_dump[i][5] + data_dump[i][4] + data_dump[i][6])) + ')))' + '((((' + data_dump[i][7] + '))))'
         elif data_dump[i][1] == data_dump[i - 1][0] and data_dump[i - 1][1] is None:
-            data += data_dump[i][3] + '(((' + str(data_dump[i][4] / (data_dump[i][5] + data_dump[i][4])) + ')))'
+            data += data_dump[i][3] + '(((' + str(data_dump[i][4] / (data_dump[i][5] + data_dump[i][4] + data_dump[i][6])) + ')))' + '((((' + data_dump[i][7] + '))))'
         elif data_dump[i][1] == data_dump[i - 1][0]:
-            data += '   ' + data_dump[i][3] + '(((' + str(data_dump[i][4] / (data_dump[i][5] + data_dump[i][4])) + ')))'
+            data += '   ' + data_dump[i][3] + '(((' + str(data_dump[i][4] / (data_dump[i][5] + data_dump[i][4] + data_dump[i][6])) + ')))' + '((((' + data_dump[i][7] + '))))'
         else:
             data += '\n'
             # for j in range(find_null(data_dump, find_elem(data_dump, data_dump[i][1])), find_elem(data_dump, data_dump[i][1]) + 1):
@@ -222,20 +224,20 @@ def dashboard(request, username, usr_id):
                 if x == i:
                     x = find_elem(data_dump, data_dump[x][1])
                     # data += data_dump[x][3]
-                    to_be_reversed.append(data_dump[x][3] + '(((' + str(data_dump[x][4] / (data_dump[x][5] + data_dump[x][4])) + ')))')
+                    to_be_reversed.append(data_dump[x][3] + '(((' + str(data_dump[x][4] / (data_dump[x][5] + data_dump[x][4] + data_dump[x][6])) + ')))' + '((((' + data_dump[x][7] + '))))')
                 else:
                     x = find_elem(data_dump, data_dump[x][1])
                     # data += '   ' + data_dump[x][3]
-                    to_be_reversed.append(data_dump[x][3] + '(((' + str(data_dump[x][4] / (data_dump[x][5] + data_dump[x][4])) + ')))')
+                    to_be_reversed.append(data_dump[x][3] + '(((' + str(data_dump[x][4] / (data_dump[x][5] + data_dump[x][4] + data_dump[x][6])) + ')))' + '((((' + data_dump[x][7] + '))))')
             to_be_reversed.reverse()
             for c in range(0, len(to_be_reversed)): 
                 if c == 0:
                     data += to_be_reversed[c]
                 else:
                     data += '   ' + to_be_reversed[c]
-            data += '   ' + data_dump[i][3] + '(((' + str(data_dump[i][4] / (data_dump[i][5] + data_dump[i][4])) + ')))'
+            data += '   ' + data_dump[i][3] + '(((' + str(data_dump[i][4] / (data_dump[i][5] + data_dump[i][4] + data_dump[i][6])) + ')))' + '((((' + data_dump[i][7] + '))))'
     data = data.replace('\n\n', '\n')
-    print(data)
+    # print(data)
     tree = {}
     for line in data.split("\n"):
         node = tree
@@ -268,6 +270,7 @@ def node_to_js(tree, parent=4):
             "name": name[0:name.index('(((')],
             "color": '#'+('%02x%02x%02x' % (int(255.0 * (1 - (float(name[name.index('(((')+3:name.index(')))')])))), 0, int(255.0 * float(name[name.index('(((')+3:name.index(')))')])))),
             "parent": parent,
+            "position": name[name.index('((((')+4:name.index('))))')],
             "children": node_to_js(node, name)
         }
         for name, node in tree.items()
