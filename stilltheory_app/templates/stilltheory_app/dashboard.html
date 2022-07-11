@@ -28,25 +28,34 @@
 	  stroke: #ccc;
 	  stroke-width: 2px;
 	}
+{% comment %} 
+	#div_template {
+		position: absolute
+	} {% endcomment %}
 	
-	div.tooltip {   
-		position: absolute;         
+	{% comment %} div.tooltip {   
+		position: absolute;        
+		height: 500px;
+		width: 500px;
+		background-color: black;
+		color: red;
+		font-size: 15pt 
 		/*your other styles here*/;              
-	}
+	} {% endcomment %}
     </style>
 
   </head>
   <p id="demo"></p>
 
   <body>
-<div class="board1" id="board1"></div>
+	<div id="div_template"></div>
 
-<div class='tooltip'></div>
 <!-- load the d3.js library -->	
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
 <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 
-<script></script>
 
 
 <script type='module'>
@@ -89,25 +98,22 @@ function update(source) {
   // Compute the new tree layout.
   var nodes = tree.nodes(root).reverse(),
 	  links = tree.links(nodes);
-
+	  
   // Normalize for fixed-depth.
   nodes.forEach(function(d) { d.y = d.depth * 400; });
 
-  svg.selectAll()
-  var tooltip = d3.select("body").append("div") 
-	.attr("class", "tooltip")               
-	.style("opacity", 0);
+ 
+/*.on("mouseout", function(d) {
+		tooltip.style("opacity", 0);
+//	});*/
+
   // Update the nodes…
+  
+
+
   var node = svg.selectAll("g.node")
 	  .data(nodes, function(d) { return d.id || (d.id = ++i); });
-	  .on("mousemove", function(d) {
-		tooltip.html("Hello, I am<br>a tooltip!")
-			.style('top', d3.event.pageY - 6 + 'px')
-			.style('left', d3.event.pageX + 10 + 'px')
-			.style("opacity", 1);
-		}).on("mouseout", function(d) {
-			tooltip.style("opacity", 0);
-		});
+
 	  
 
   // Enter any new nodes at the parent's previous position.
@@ -139,10 +145,7 @@ function update(source) {
   .style("fill", function(d) {return d._children ? shadeColor(d.color, -20) : d.color; }) 
 
 
-  //.on('mouseover', function(d) {
-	//document.getElementById('popup').style.display = 'block';
 	
-  //})
   
 
 
@@ -203,6 +206,40 @@ function update(source) {
 	d.x0 = d.x;
 	d.y0 = d.y;
   });
+
+  var Tooltip = d3.select("#div_template")
+  .append("div")
+  .style("opacity", 0)
+  .attr("class", "tooltip")
+  .style("background-color", "green")
+  .style("border", "solid")
+  .style("border-width", "2px")
+  .style("border-radius", "5px")
+  .style("padding", "5px")
+  
+
+
+  svg.selectAll("g.node")
+    .on("mouseover", function(d) {
+	Tooltip
+	  .style("opacity", 1)
+	d3.select(this)
+	  .style("stroke", "black")
+	  .style("opacity", 1)
+  })
+  	.on("mousemove", function(d) {
+	Tooltip
+	  .html("The exact value of<br>this cell is: " + d.position)
+	  .style("left", (d3.mouse(this)[0]+70) + "px")
+	  .style("top", (d3.mouse(this)[1]) + "px")
+  })
+  .on("mouseleave", function(d) {
+	Tooltip
+	  .style("opacity", 0)
+	d3.select(this)
+	  .style("stroke", "none")
+	  .style("opacity", 0.9)
+  })	
 }
 
 function shadeColor(color, percent) {
