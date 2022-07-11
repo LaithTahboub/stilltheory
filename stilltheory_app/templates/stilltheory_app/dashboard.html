@@ -100,14 +100,14 @@ function update(source) {
   // Update the nodes…
   var node = svg.selectAll("g.node")
 	  .data(nodes, function(d) { return d.id || (d.id = ++i); });
-	 /* .on("mousemove", function(d) {
+	  .on("mousemove", function(d) {
 		tooltip.html("Hello, I am<br>a tooltip!")
 			.style('top', d3.event.pageY - 6 + 'px')
 			.style('left', d3.event.pageX + 10 + 'px')
 			.style("opacity", 1);
 		}).on("mouseout", function(d) {
 			tooltip.style("opacity", 0);
-		});*/
+		});
 	  
 
   // Enter any new nodes at the parent's previous position.
