@@ -7,6 +7,8 @@
 
     <title>Tree Example</title>
 	<div id="popup" style="display: none">description text here</div>
+	<div id="div_template"></div>
+
     <style>
 	
 	.node {
@@ -28,10 +30,11 @@
 	  stroke: #ccc;
 	  stroke-width: 2px;
 	}
-{% comment %} 
+
 	#div_template {
-		position: absolute
-	} {% endcomment %}
+		position: absolute;
+
+	} 
 	
 	{% comment %} div.tooltip {   
 		position: absolute;        
@@ -48,7 +51,6 @@
   <p id="demo"></p>
 
   <body>
-	<div id="div_template"></div>
 
 <!-- load the d3.js library -->	
 
@@ -211,12 +213,13 @@ function update(source) {
   .append("div")
   .style("opacity", 0)
   .attr("class", "tooltip")
-  .style("background-color", "green")
+  .style("background-color", "white")
   .style("border", "solid")
   .style("border-width", "2px")
   .style("border-radius", "5px")
   .style("padding", "5px")
-  
+  .style("position", "absolute")
+
 
 
   svg.selectAll("g.node")
@@ -230,8 +233,8 @@ function update(source) {
   	.on("mousemove", function(d) {
 	Tooltip
 	  .html("The exact value of<br>this cell is: " + d.position)
-	  .style("left", (d3.mouse(this)[0]+70) + "px")
-	  .style("top", (d3.mouse(this)[1]) + "px")
+	  .style("top", (event.pageY)+"px")
+	  .style("left",(event.pageX)+"px")
   })
   .on("mouseleave", function(d) {
 	Tooltip
