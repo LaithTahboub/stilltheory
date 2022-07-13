@@ -7,9 +7,11 @@
 
     <title>Tree Example</title>
 	<div id="popup" style="display: none">description text here</div>
-	<div id="div_template"></div>
-
+	<div id="div_template">	<div id="board1" style="width: 400px"></div></div>
     <style>
+	#board1 {
+		position: absolute
+	}
 	
 	.node {
 		cursor: pointer;
@@ -58,10 +60,20 @@
 <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
 <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 
+<link rel="stylesheet"
+      href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css"
+      integrity="sha384-q94+BZtLrkL1/ohfjR8c6L+A6qzNH9R2hBLwyoAfu3i/WCvQjzL2RQJ3uNHDISdU"
+      crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"
+        integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2"
+        crossorigin="anonymous"></script>
 
+<script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"
+        integrity="sha384-8Vi8VHwn3vjQ9eUHUxex3JSN/NFqUg3QbPyX8kWyb93+8AC/pPWTzj+nHtbC5bxD"
+        crossorigin="anonymous"></script>
 
 <script type='module'>
-{% comment %} import {COLOR, Chessboard} from "src/cm-chessboard/Chessboard.js" {% endcomment %}
+{% comment %} import * from './chessboardjs-1.0.0' {% endcomment %}
 
 var data = '{{str|escapejs}}';
 var treeData = eval(data)
@@ -219,11 +231,19 @@ function update(source) {
   .style("border-radius", "5px")
   .style("padding", "5px")
   .style("position", "absolute")
-
+  .style("min-height", "500px")
+  .style("width", "382px")
+  var board = Chessboard('board1', 'start')
+  var b1 = d3.select('#board1')
+  .style("opacity", 0)
+  .style("z-index", 999)
 
 
   svg.selectAll("g.node")
+  	
     .on("mouseover", function(d) {
+	b1
+	.style("opacity", 1)
 	Tooltip
 	  .style("opacity", 1)
 	d3.select(this)
@@ -231,12 +251,20 @@ function update(source) {
 	  .style("opacity", 1)
   })
   	.on("mousemove", function(d) {
+	board.position(d.position)
+	b1
+	.style("top", (event.pageY + 80)+"px")
+	.style("left",(event.pageX)+"px")
 	Tooltip
 	  .html("The exact value of<br>this cell is: " + d.position)
 	  .style("top", (event.pageY)+"px")
 	  .style("left",(event.pageX)+"px")
   })
   .on("mouseleave", function(d) {
+	b1
+	.style("opacity", 0)
+
+
 	Tooltip
 	  .style("opacity", 0)
 	d3.select(this)
