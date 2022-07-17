@@ -60,17 +60,9 @@
 <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
 <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 
-<link rel="stylesheet"
-      href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css"
-      integrity="sha384-q94+BZtLrkL1/ohfjR8c6L+A6qzNH9R2hBLwyoAfu3i/WCvQjzL2RQJ3uNHDISdU"
-      crossorigin="anonymous">
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"
-        integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2"
-        crossorigin="anonymous"></script>
-
-<script src="https://laithtahboub.github.io/chessboard-1.0.0.js" 
-integrity="sha384-NYh4seNxLLO+g5G61I1xC+6K/C97QStOINBgNMOYT5eOMVzoRsstd55dPKXiWsWM" 
-crossorigin="anonymous"></script>
+<link rel="stylesheet" href="{% static "css/chessboard-1.0.0.min.css" %}">
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script src="{% static "js/chessboard-1.0.0.js" %}"></script>
 
 <script type='module'>
 {% comment %} import * from './chessboardjs-1.0.0' {% endcomment %}
