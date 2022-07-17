@@ -8,5 +8,6 @@ urlpatterns = [
     path('dashboard/<str:username>/<int:usr_id>', views.dashboard, name='dashboard'),
     path('get_token', views.get_token, name='get_token'),
     re_path(r'^login/(?P<code>\w)/(?P<state>\w)$', views.login, name='login'),
-    path('finish_login/<str:token>', views.finish_login, name='finish_login')   
+    path('finish_login/<str:token>', views.finish_login, name='finish_login'),
+    # pieces:
 ]

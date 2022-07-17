@@ -168,6 +168,7 @@ def username_testpage(request):
 
     return render(request, 'stilltheory_app/username.html', {})
 
+
 def dashboard(request, username, usr_id):
     # get
     prepare_database(username, usr_id)
