@@ -869,8 +869,7 @@
     }
 
     function buildPieceHTML (piece, hidden, id) {
-
-      var html = '<img src="{%static "' + buildPieceImgSrc(piece) + '"%}"'
+      var html = '<img src = "{%static "wR.png" %}"'
       if (isString(id) && id !== '') {
         html += 'id="' + id + '" '
       }

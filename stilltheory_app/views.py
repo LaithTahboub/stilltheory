@@ -251,8 +251,7 @@ def dashboard(request, username, usr_id):
     str_list = str(list_to_js)
     str_list = ('[{"name": "Repertoire", "parent": null, "color": "green", "children": ') + (str_list) + ('}];')
 
-    return render(request, 'stilltheory_app/dashboard.html', {'str': str_list})    
-
+    return render(request, 'stilltheory_app/dashboard.html', {'str': str_list, 'piece': 'bB.png'})   
 
 def find_elem(arr, x):
     for i in range(0, len(arr)):
