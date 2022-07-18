@@ -330,7 +330,7 @@ def prepare_database(usr, usr_id):
                 cursor9 = conn.cursor()
                 cursor9.execute(
                     """
-                    SELECT position, id
+                    SELECT position, id, fen_position
                     FROM opening_tree 
                     WHERE parent_id = '%s' AND user_id = '%s'
                     """ % (record[0], usr_id)
@@ -351,9 +351,9 @@ def prepare_database(usr, usr_id):
                 cursor11.execute(
                     """
                     UPDATE opening_tree
-                    SET position = '%s'
+                    SET position = '%s', fen_position = '%s'
                     WHERE sequence = '%s' AND id = '%s' AND user_id = '%s'
-                    """ % (child_record[0], i, record[0], usr_id)
+                    """ % (child_record[0], child_record[2], i, record[0], usr_id)
                 )
                 conn.commit()
 
