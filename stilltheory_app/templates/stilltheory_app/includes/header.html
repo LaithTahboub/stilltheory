@@ -4,11 +4,6 @@
 <head>
     <meta charset="UTF-8">
       
-    <title>
-        Bootstrap Navbar Change
-        Active Class Link
-    </title>
-      
     <link rel="stylesheet" href=
 "https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
       
@@ -26,6 +21,7 @@
 </head>
   
 <body>
+    
     <div id="topheader">
         <nav class="navbar navbar-default">
             <div class="container-fluid">
@@ -41,7 +37,7 @@
                             home</a>
                         </li>
                         <li><a href="#page1">About</a></li>
-                        <li><a href="{% url 'dashboard' username='unclezebra' usr_id=4%}">Dashboard</a></li>
+                        <li><a href="{% url 'dashboard' username='UncleZebra' usr_id=4 color='white'%}">Dashboard</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         <li><a href="{%url 'get_token'%}">Log in</a></li>

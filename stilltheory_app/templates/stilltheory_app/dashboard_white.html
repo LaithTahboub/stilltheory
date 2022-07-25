@@ -5,54 +5,54 @@
   <head>
     <meta charset="utf-8">
 
-    <title>Tree Example</title>
+    <title>stilltheory.com</title>
 	<div id="popup" style="display: none">description text here</div>
-	<div id="div_template">	<div id="board1" style="width: 400px"></div></div>
+	<div id="div_template">	</div><div id="board1" style="width: 400px"></div>
+	{% comment %} <button id="gotoblack" style="height: 100px; width: 100px"><img src="{% static "img/chesspieces/wikipedia/wP.png" %}"></button> {% endcomment %}
+
     <style>
+	#gotoblack:hover {
+		background-color: yellow;
+		color: yellow
+	}
 	#board1 {
-		position: absolute
+		position: absolute;
+		z-index: 999
 	}
 	
 	.node {
 		cursor: pointer;
+		text-align: center;
+
 	}
 
 	.node circle {
 	  fill: #fff;
 	  stroke: steelblue;
 	  stroke-width: 3px;
+	  text-align: center;
 	}
 
 	.node text {
-	  font: 12px sans-serif;
+	  font: 15px sans-serif;
 	}
 
 	.link {
 	  fill: none;
-	  stroke: #ccc;
-	  stroke-width: 2px;
+	  stroke: purple
 	}
 
 	#div_template {
 		position: absolute;
-
+		z-index:998
 	} 
-	
-	{% comment %} div.tooltip {   
-		position: absolute;        
-		height: 500px;
-		width: 500px;
-		background-color: black;
-		color: red;
-		font-size: 15pt 
-		/*your other styles here*/;              
-	} {% endcomment %}
     </style>
 
   </head>
   <p id="demo"></p>
 
   <body>
+	{% include "stilltheory_app/includes/header.html" %}
 
 <!-- load the d3.js library -->	
 
@@ -62,7 +62,10 @@
 
 <link rel="stylesheet" href="{% static "css/chessboard-1.0.0.min.css" %}">
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-{% comment %} <script src="{% static "js/chessboard-1.0.0.js" %}"></script> {% endcomment %}
+{% comment %} onclick="location.href='{% url 'dashboard' username='unclezebra' usr_id=4 color='white'%}'" {% endcomment %}
+
+
+
 
 <script type='module'>
 {% comment %} import * from './chessboardjs-1.0.0' {% endcomment %}
@@ -99,6 +102,39 @@ update(root);
 
 d3.select(self.frameElement).style("height", "500px");
 
+function wrap(text, width) {
+    text.each(function () {
+        var text = d3.select(this),
+            words = text.text().split(/\s+/).reverse(),
+            word,
+            line = [],
+            lineNumber = 0,
+            lineHeight = 1.1, // ems
+            x = text.attr("x"),
+            y = text.attr("y"),
+            dy = 0, //parseFloat(text.attr("dy")),
+            tspan = text.text(null)
+                        .append("tspan")
+                        .attr("x", x)
+                        .attr("y", y)
+                        .attr("dy", dy + "em");
+        while (word = words.pop()) {
+            line.push(word);
+            tspan.text(line.join(" "));
+            if (tspan.node().getComputedTextLength() > width) {
+                line.pop();
+                tspan.text(line.join(" "));
+                line = [word];
+                tspan = text.append("tspan")
+                            .attr("x", x)
+                            .attr("y", y)
+                            .attr("dy", ++lineNumber * lineHeight + dy + "em")
+                            .text(word);
+            }
+        }
+    });
+}
+
 function update(source) {
 
   // Compute the new tree layout.
@@ -109,12 +145,6 @@ function update(source) {
   nodes.forEach(function(d) { d.y = d.depth * 400; });
 
  
-/*.on("mouseout", function(d) {
-		tooltip.style("opacity", 0);
-//	});*/
-
-  // Update the nodes…
-  
 
 
   var node = svg.selectAll("g.node")
@@ -131,14 +161,32 @@ function update(source) {
   nodeEnter.append("circle")
 	  .attr("r", 1e-6)
 	  .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
-
+	//  .text(function(d) {return d.winrate;})
   nodeEnter.append("text")
-	  .attr("x", function(d) { return d.children || d._children ? -20 : 20; })
+	  .attr("x", function(d) { return d.children || d._children ? -27 : 27; })
 	  .attr("dy", ".35em")
-	  .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+	  .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start";})
+	  .style("fill-opacity", 1e-6)
+	  .style("width", "10px")
+	  .style("overflow-wrap", "break-word")
 	  .text(function(d) { return d.name; })
-	  .style("fill-opacity", 1e-6);
-
+	  .call(wrap, 200);
+   nodeEnter.append("text")
+    .style("fill", "#FFFFFF")
+	.attr("x", function(d) { return 0})
+	.attr("dy", "-2px")
+	.attr("text-anchor", "middle")
+	.text(function(d) { return d.winrate })
+	.style("fill-opacity", 1)
+	.style("font-size", "10pt");
+	nodeEnter.append("text")
+    .style("fill", "#FFFFFF")
+	.attr("x", function(d) { return 0})
+	.attr("dy", "10px")
+	.attr("text-anchor", "middle")
+	.text(function(d) { return d.numgames })
+	.style("fill-opacity", 1)
+	.style("font-size", "7.5pt");
   // Transition nodes to their new position.
   var nodeUpdate = node.transition()
 	  .duration(duration)
@@ -147,27 +195,19 @@ function update(source) {
 
 	
   nodeUpdate.select("circle")
-  .attr("r", 15)
+  .attr("r", function(d) {return 22})
   .style("fill", function(d) {return d._children ? shadeColor(d.color, -20) : d.color; }) 
 
-
-	
-  
-
-
- // new Chessboard(document.getElementById("board1"), {
-	//	position: "rn2k1r1/ppp1pp1p/3p2p1/5bn1/P7/2N2B2/1PPPPP2/2BNK1RR w Gkq - 4 11",
-	// 	sprite: {url: "../../../static/assets/images/chessboard-sprite-staunty.svg"},
-//		orientation: COLOR.black
- // })
-
-//  nodes.forEach(function(d) { 
-//	nodeUpda§te.select("circle")
-//	.attr("r", 15)
-//	.style("fill", d.color) });
+//  .attr("x", function(d) { return d.children || d._children ? -20 : 20; })
+//  .attr("dy", ".35em")
+//  .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+ // .text(function(d) { return d.name })
+ // .style("-opacity", 1e-6);
 
   nodeUpdate.select("text")
 	  .style("fill-opacity", 1);
+
+	
 
   // Transition exiting nodes to the parent's new position.
   var nodeExit = node.exit().transition()
@@ -184,10 +224,16 @@ function update(source) {
   // Update the links…
   var link = svg.selectAll("path.link")
 	  .data(links, function(d) { return d.target.id; });
+  function norm(val, max, min) { return (val - min) / (max - min); }
 
   // Enter any new links at the parent's previous position.
   link.enter().insert("path", "g")
 	  .attr("class", "link")
+	  
+	  .style("stroke-width", function(d) {return +d.target.numgames * .2 + 4;})
+	  .style("opacity", function(d) {return d.target.numgames * .01 + .3})
+
+	  
 	  .attr("d", function(d) {
 		var o = {x: source.x0, y: source.y0};
 		return diagonal({source: o, target: o});
@@ -248,7 +294,7 @@ function update(source) {
 	.style("top", (event.pageY + 80)+"px")
 	.style("left",(event.pageX)+"px")
 	Tooltip
-	  .html("The exact value of<br>this cell is: " + d.position)
+
 	  .style("top", (event.pageY)+"px")
 	  .style("left",(event.pageX)+"px")
   })
