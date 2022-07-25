@@ -68,6 +68,9 @@
 
 
 <script type='module'>
+var checkBox = document.getElementById("myCheck");
+checkBox.checked = true
+
 {% comment %} import * from './chessboardjs-1.0.0' {% endcomment %}
 
 var data = '{{str|escapejs}}';

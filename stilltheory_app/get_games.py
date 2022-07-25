@@ -305,11 +305,11 @@ def prepare_database(usr, usr_id):
        WHERE po.position = SUBSTRING(co.position, 0, (LENGTH(co.position) - STRPOS(REVERSE(co.position), ' ') + 1 )) 
 	   AND po.user_id = co.user_id 
 	   AND po.color = co.color
-       LIMIT 1)
+       LIMIT 1) 
     WHERE co.sequence > 1
     """)
     conn.commit()
-
+# TODO: find out why removing limit 1 in previous query leads to cardinality violation
 # merge logic:
     for i in range(14, 0, -1):
         cursor8 = conn.cursor()

@@ -1,3 +1,5 @@
+{% load static%}
+
 <!DOCTYPE html>
 <html lang="en" >
   
@@ -7,9 +9,11 @@
     <link rel="stylesheet" href=
 "https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
       
+<link rel="shortcut icon" href="{% static "img/chesspieces/wikipedia/bB.png" %}">
+
     <link rel='stylesheet' href=
 'https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css'>
-      
+<link rel='stylesheet' href="{% static "stilltheory_app/includes/header.css"%}">
     <script src=
 'https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js'>
     </script>
@@ -40,7 +44,15 @@
                         <li><a href="{% url 'dashboard' username='UncleZebra' usr_id=4 color='white'%}">Dashboard</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a href="{%url 'get_token'%}">Log in</a></li>
+                        <li>
+                            <img width="40px" src="{% static "img/chesspieces/wikipedia/wN.png" %}">
+                            <label class="switch">
+                            <input type="checkbox" onclick="toggleColor()" id="myCheck">
+
+
+                            <span class="slider round"></span>
+                          </label><img width="40px" src="{% static "img/chesspieces/wikipedia/bN.png" %}"></li>
+                        <li><a href="{% url 'get_token'%}" style="padding-left: 50px">Log in</a></li>
                     </ul>
                 </div>
             </div>
@@ -48,6 +60,18 @@
     </div>
   
     <script>
+        
+
+        function toggleColor() {
+            var checkBox = document.getElementById("myCheck");
+            if (checkBox.checked == true){
+                window.location.href = "{% url 'dashboard' username='UncleZebra' usr_id=4 color='black'%}"
+
+              } else {
+                window.location.href = "{% url 'dashboard' username='UncleZebra' usr_id=4 color='white'%}"
+              }
+        }
+
         $( '#topheader .navbar-nav a' ).on('click', 
                     function () {
             $( '#topheader .navbar-nav' ).find( 'li.active' )
