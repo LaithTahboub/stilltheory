@@ -7,7 +7,7 @@
 
     <title>stilltheory.com</title>
 	<div id="popup" style="display: none">description text here</div>
-	<div id="div_template">	</div><div id="board1" style="width: 400px"></div>
+	<div id="div_template"></div><div id="board1" style="width: 400px"></div>
 	{% comment %} <button id="gotoblack" style="height: 100px; width: 100px"><img src="{% static "img/chesspieces/wikipedia/wP.png" %}"></button> {% endcomment %}
 
     <style>
@@ -39,26 +39,28 @@
 
 	.link {
 	  fill: none;
-	  stroke: purple
+	  stroke: #404040
 	}
 
 	#div_template {
 		position: absolute;
-		z-index:998
+		z-index:998;
+
 	} 
+
     </style>
 
   </head>
   <p id="demo"></p>
 
   <body>
+	
 	{% include "stilltheory_app/includes/header.html" %}
 
 <!-- load the d3.js library -->	
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
 <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
-<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 
 <link rel="stylesheet" href="{% static "css/chessboard-1.0.0.min.css" %}">
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
@@ -69,7 +71,7 @@
 
 <script type='module'>
 {% comment %} import * from './chessboardjs-1.0.0' {% endcomment %}
-
+document.body.style.zoom=.6;
 var data = '{{str|escapejs}}';
 var treeData = eval(data)
 
@@ -88,12 +90,14 @@ var tree = d3.layout.tree()
 var diagonal = d3.svg.diagonal()
 	.projection(function(d) { return [d.y, d.x]; });
 
+
+
 var svg = d3.select("body").append("svg")
 	.attr("width", width + margin.right + margin.left)
 	.attr("height", height + margin.top + margin.bottom)
   .append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
+	
 root = treeData[0];
 root.x0 = height / 2;
 root.y0 = 0;
@@ -187,6 +191,7 @@ function update(source) {
 	.text(function(d) { return d.numgames })
 	.style("fill-opacity", 1)
 	.style("font-size", "7.5pt");
+	
   // Transition nodes to their new position.
   var nodeUpdate = node.transition()
 	  .duration(duration)
@@ -270,11 +275,13 @@ function update(source) {
   .style("padding", "5px")
   .style("position", "absolute")
   .style("min-height", "500px")
-  .style("width", "382px")
+  .style("width", "396px")
+  
   var board = Chessboard('board1', 'start')
   var b1 = d3.select('#board1')
   .style("opacity", 0)
   .style("z-index", 999)
+
 
 
   svg.selectAll("g.node")
@@ -287,6 +294,7 @@ function update(source) {
 	d3.select(this)
 	  .style("stroke", "black")
 	  .style("opacity", 1)
+ 
   })
   	.on("mousemove", function(d) {
 	board.position(d.position)
@@ -294,9 +302,9 @@ function update(source) {
 	.style("top", (event.pageY + 80)+"px")
 	.style("left",(event.pageX)+"px")
 	Tooltip
-
 	  .style("top", (event.pageY)+"px")
 	  .style("left",(event.pageX)+"px")
+
   })
   .on("mouseleave", function(d) {
 	b1
@@ -308,6 +316,8 @@ function update(source) {
 	d3.select(this)
 	  .style("stroke", "none")
 	  .style("opacity", 0.9)
+
+	
   })	
 }
 

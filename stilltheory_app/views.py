@@ -198,14 +198,14 @@ def dashboard(request, username, usr_id, color):
     else:
         cursor.execute("""
         WITH RECURSIVE opening_tree_visual AS (
-            SELECT id, parent_id, position, opening_variation, num_wins, num_losses, num_draws, fen_position,
+            SELECT id, parent_id, position, opening_variation, num_wins, num_losses, num_draws, fen_position, position,
                     to_char(id,'9999') AS path
             FROM opening_tree
             WHERE parent_id IS NULL AND user_id = '%s' AND color = 'black'
 
             UNION ALL
 
-            SELECT o.id, o.parent_id, o.position, o.opening_variation, o.num_wins, o.num_losses, o.num_draws, o.fen_position,
+            SELECT o.id, o.parent_id, o.position, o.opening_variation, o.num_wins, o.num_losses, o.num_draws, o.fen_position, o.position,
                     opening_tree_visual.path || '->' || to_char(o.id,'9999')
             FROM opening_tree o, opening_tree_visual
             WHERE o.parent_id = opening_tree_visual.id AND user_id = '%s'
@@ -222,31 +222,26 @@ def dashboard(request, username, usr_id, color):
     # TODO: consider adding draws to total
     data_dump = cursor.fetchall()
     if data_dump[1][1] == data_dump[0][0]:
-        data += data_dump[0][3] + '(((' + str(data_dump[0][4] / (data_dump[0][5] + data_dump[0][4] + data_dump[0][6])) + ')))' + '((((' + data_dump[0][7] + '))))' + '(((((' + str(int(data_dump[0][4] + data_dump[0][5] + data_dump[0][6])) + ')))))' + '\n' + data_dump[0][3] + '(((' + str(data_dump[0][4] / (data_dump[0][5] + data_dump[0][4] + data_dump[0][6])) + ')))' + '((((' + data_dump[0][7] + '))))' + '(((((' + str(int(data_dump[0][4] + data_dump[0][5] + data_dump[0][6])) + ')))))' + '   '
+        data += data_dump[0][3] + '(((' + str(data_dump[0][4] / (data_dump[0][5] + data_dump[0][4] + data_dump[0][6])) + ')))' + '((((' + data_dump[0][7] + '))))' + '(((((' + str(int(data_dump[0][4] + data_dump[0][5] + data_dump[0][6])) + ')))))' + '((((((' + sanize_str(data_dump[0][8]) + '))))))' + '\n' + data_dump[0][3] + '(((' + str(data_dump[0][4] / (data_dump[0][5] + data_dump[0][4] + data_dump[0][6])) + ')))' + '((((' + data_dump[0][7] + '))))' + '(((((' + str(int(data_dump[0][4] + data_dump[0][5] + data_dump[0][6])) + ')))))' + '((((((' + sanize_str(data_dump[0][8]) + '))))))' + '   '
     else:
-        data += data_dump[0][3] + '(((' + str(data_dump[0][4] / (data_dump[0][5] + data_dump[0][4] + data_dump[0][6])) + ')))' + '((((' + data_dump[0][7] + '))))' + '(((((' + str(int(data_dump[0][4] + data_dump[0][5] + data_dump[0][6])) + ')))))' + '\n' + data_dump[0][3] + '(((' + str(data_dump[0][4] / (data_dump[0][5] + data_dump[0][4] + data_dump[0][6])) + ')))' + '((((' + data_dump[0][7] + '))))' + '(((((' + str(int(data_dump[0][4] + data_dump[0][5] + data_dump[0][6])) + ')))))'
+        data += data_dump[0][3] + '(((' + str(data_dump[0][4] / (data_dump[0][5] + data_dump[0][4] + data_dump[0][6])) + ')))' + '((((' + data_dump[0][7] + '))))' + '(((((' + str(int(data_dump[0][4] + data_dump[0][5] + data_dump[0][6])) + ')))))' + '((((((' + sanize_str(data_dump[0][8]) + '))))))' + '\n' + data_dump[0][3] + '(((' + str(data_dump[0][4] / (data_dump[0][5] + data_dump[0][4] + data_dump[0][6])) + ')))' + '((((' + data_dump[0][7] + '))))' + '(((((' + str(int(data_dump[0][4] + data_dump[0][5] + data_dump[0][6])) + ')))))' + '((((((' + sanize_str(data_dump[0][8]) + '))))))'
     for i in range(1, len(data_dump)):
         if data_dump[i][1] is None and i < len(data_dump) - 1 and data_dump[i + 1][1] == data_dump[i][0]:
-            data += '\n' + data_dump[i][3] + '(((' + str(data_dump[i][4] / (data_dump[i][5] + data_dump[i][4] + data_dump[i][6])) + ')))' + '((((' + data_dump[i][7] + '))))' + '(((((' + str(int(data_dump[i][4] + data_dump[i][5] + data_dump[i][6])) + ')))))' + '   '
+            data += '\n' + data_dump[i][3] + '(((' + str(data_dump[i][4] / (data_dump[i][5] + data_dump[i][4] + data_dump[i][6])) + ')))' + '((((' + data_dump[i][7] + '))))' + '(((((' + str(int(data_dump[i][4] + data_dump[i][5] + data_dump[i][6])) + ')))))' + '((((((' + sanize_str(data_dump[i][8]) + '))))))' + '   '
         elif data_dump[i][1] is None:
-            data += '\n' + data_dump[i][3] + '(((' + str(data_dump[i][4] / (data_dump[i][5] + data_dump[i][4] + data_dump[i][6])) + ')))' + '((((' + data_dump[i][7] + '))))' + '(((((' + str(int(data_dump[i][4] + data_dump[i][5] + data_dump[i][6])) + ')))))'
+            data += '\n' + data_dump[i][3] + '(((' + str(data_dump[i][4] / (data_dump[i][5] + data_dump[i][4] + data_dump[i][6])) + ')))' + '((((' + data_dump[i][7] + '))))' + '(((((' + str(int(data_dump[i][4] + data_dump[i][5] + data_dump[i][6])) + ')))))' + '((((((' + sanize_str(data_dump[i][8]) + '))))))'
         elif data_dump[i][1] == data_dump[i - 1][0] and data_dump[i - 1][1] is None:
-            data += data_dump[i][3] + '(((' + str(data_dump[i][4] / (data_dump[i][5] + data_dump[i][4] + data_dump[i][6])) + ')))' + '((((' + data_dump[i][7] + '))))' + '(((((' + str(int(data_dump[i][4] + data_dump[i][5] + data_dump[i][6])) + ')))))'
+            data += data_dump[i][3] + '(((' + str(data_dump[i][4] / (data_dump[i][5] + data_dump[i][4] + data_dump[i][6])) + ')))' + '((((' + data_dump[i][7] + '))))' + '(((((' + str(int(data_dump[i][4] + data_dump[i][5] + data_dump[i][6])) + ')))))' + '((((((' + sanize_str(data_dump[i][8]) + '))))))'
         elif data_dump[i][1] == data_dump[i - 1][0]:
-            data += '   ' + data_dump[i][3] + '(((' + str(data_dump[i][4] / (data_dump[i][5] + data_dump[i][4] + data_dump[i][6])) + ')))' + '((((' + data_dump[i][7] + '))))' + '(((((' + str(int(data_dump[i][4] + data_dump[i][5] + data_dump[i][6])) + ')))))'
+            data += '   ' + data_dump[i][3] + '(((' + str(data_dump[i][4] / (data_dump[i][5] + data_dump[i][4] + data_dump[i][6])) + ')))' + '((((' + data_dump[i][7] + '))))' + '(((((' + str(int(data_dump[i][4] + data_dump[i][5] + data_dump[i][6])) + ')))))' + '((((((' + sanize_str(data_dump[i][8]) + '))))))'
         else:
             data += '\n'
-            # for j in range(find_null(data_dump, find_elem(data_dump, data_dump[i][1])), find_elem(data_dump, data_dump[i][1]) + 1):
-            #     if j == find_null(data_dump, find_elem(data_dump, data_dump[i][1])):
-            #         data += data_dump[j][3]
-            #     else:
-            #         data += '   ' + data_dump[j][3]
             x = i   
             to_be_reversed = []
             while(data_dump[x][1] is not None):
                 x = find_elem(data_dump, data_dump[x][1])
                 # data += data_dump[x][3]
-                to_be_reversed.append(data_dump[x][3] + '(((' + str(data_dump[x][4] / (data_dump[x][5] + data_dump[x][4] + data_dump[x][6])) + ')))' + '((((' + data_dump[x][7] + '))))' + '(((((' + str(int(data_dump[x][4] + data_dump[x][5] + data_dump[x][6])) + ')))))')
+                to_be_reversed.append(data_dump[x][3] + '(((' + str(data_dump[x][4] / (data_dump[x][5] + data_dump[x][4] + data_dump[x][6])) + ')))' + '((((' + data_dump[x][7] + '))))' + '(((((' + str(int(data_dump[x][4] + data_dump[x][5] + data_dump[x][6])) + ')))))' + '((((((' +sanize_str(data_dump[x][8]) + '))))))')
                 
             to_be_reversed.reverse()
             for c in range(0, len(to_be_reversed)): 
@@ -254,7 +249,7 @@ def dashboard(request, username, usr_id, color):
                     data += to_be_reversed[c]
                 else:
                     data += '   ' + to_be_reversed[c]
-            data += '   ' + data_dump[i][3] + '(((' + str(data_dump[i][4] / (data_dump[i][5] + data_dump[i][4] + data_dump[i][6])) + ')))' + '((((' + data_dump[i][7] + '))))' + '(((((' + str(int(data_dump[i][4] + data_dump[i][5] + data_dump[i][6])) + ')))))'
+            data += '   ' + data_dump[i][3] + '(((' + str(data_dump[i][4] / (data_dump[i][5] + data_dump[i][4] + data_dump[i][6])) + ')))' + '((((' + data_dump[i][7] + '))))' + '(((((' + str(int(data_dump[i][4] + data_dump[i][5] + data_dump[i][6])) + ')))))' + '((((((' + sanize_str(data_dump[i][8]) + '))))))'
     data = data.replace('\n\n', '\n')
     # print(data)
     tree = {}
@@ -278,6 +273,19 @@ def find_elem(arr, x):
     for i in range(0, len(arr)):
         if arr[i][0] == x:
             return i
+# takes unnumbered san, makes san. O(n), TODO: try to find faster
+def sanize_str(s):
+    san = s.split(' ')
+    cnt = 1
+    ans = ""
+    for i in range(0, len(san)):
+        if i % 2 == 0:
+            ans += str(cnt) + '. ' + san[i] + ' '
+            cnt += 1
+        else:
+            ans += san[i] + ' ' 
+
+    return ans
 
 # def find_null(arr, x):
 #     for i in range(x, -1, -1):
@@ -294,6 +302,7 @@ def node_to_js(tree, parent=4):
             "position": name[name.index('((((')+4:name.index('))))')],
             "winrate": str(int(float(name[name.index('(((')+3:name.index(')))')]) * 100)) + '%',
             "numgames": str(name[name.index('(((((')+5:name.index(')))))')]),
+            "san_position": name[name.index('((((((')+6:name.index('))))))')],
             "children": node_to_js(node, name)
         }
         for name, node in tree.items()

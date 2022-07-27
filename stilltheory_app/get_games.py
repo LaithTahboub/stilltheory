@@ -5,7 +5,7 @@ import psycopg2
 import sys
 import chess
 import time
-
+# TODO: puede que la partida termine en menos que quince movimientos
 # Section 1: Obtain games
 def prepare_database(usr, usr_id):
     account = 'l'

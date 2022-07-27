@@ -39,7 +39,7 @@
 
 	.link {
 	  fill: none;
-	  stroke: purple
+	  stroke: #404040
 	}
 
 	#div_template {
@@ -68,6 +68,8 @@
 
 
 <script type='module'>
+document.body.style.zoom=.6;
+
 var checkBox = document.getElementById("myCheck");
 checkBox.checked = true
 
@@ -273,7 +275,7 @@ function update(source) {
   .style("padding", "5px")
   .style("position", "absolute")
   .style("min-height", "500px")
-  .style("width", "382px")
+  .style("width", "396px")
   var board = Chessboard('board1', 'start')
   board.orientation('black')
   var b1 = d3.select('#board1')
